@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FTTH Smart Tool</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #eef2f7;
+  padding: 20px;
+}
+.container {
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  max-width: 800px;
+  margin: auto;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+.section {
+  margin-bottom: 15px;
+}
+#result {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 10px;
+  display: none;
+  font-weight: bold;
+}
+.success { background: #d4edda; }
+.warning { background: #fff3cd; }
+.danger { background: #f8d7da; }
+
+button {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.copy { background: #28a745; color: white; }
+.reset { background: #dc3545; color: white; }
+.flowBtn { background: #6a0dad; color: #fff; }
+
+#flowBox, #slaBox, #delayBox {
+  display:none;
+  margin-top:15px;
+  background:#f3e8ff;
+  padding:15px;
+  border-radius:10px;
+  border:1px solid #d1b3ff;
+  line-height:1.8;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<h2>FTTH Smart Decision Tool</h2>
+
+<div class="section">
+<label>Survey Grace Period</label><br>
+<label><input type="radio" name="grace" value="yes"> Yes</label>
+<label><input type="radio" name="grace" value="no"> No</label>
+</div>
+
+<div class="section">
+<label>Customer Problem</label><br>
+<label><input type="radio" name="problem" value="yes"> Yes</label>
+<label><input type="radio" name="problem" value="no"> No</label>
+</div>
+
+<div class="section">
+<label>Customer Reachable</label><br>
+<label><input type="radio" name="reachable" value="yes"> Yes</label>
+<label><input type="radio" name="reachable" value="no"> No</label>
+</div>
+
+<div class="section">
+<label>Problem Resolved</label><br>
+<label><input type="radio" name="resolved" value="yes"> Yes</label>
+<label><input type="radio" name="resolved" value="no"> No</label>
+</div>
+
+<div id="result"></div>
+
+<!-- أزرار -->
+<button id="flowBtn" class="flowBtn" onclick="toggle('flowBox')" style="display:none;">MSAN Flow</button>
+<button id="slaBtn" class="flowBtn" onclick="toggle('slaBox')" style="display:none;">SLA Info</button>
+<button id="delayBtn" class="flowBtn" onclick="toggle('delayBox')" style="display:none;">Installation Delay</button>
+
+<!-- MSAN Flow -->
+<div id="flowBox">
+<h3>🧾 MSAN Deactivation Flow</h3>
+
+Step 1: Order بيتحول تلقائي<br>
+Step 2: SMS للعميل (111 / الفرع)<br>
+Step 3: Automatic TT → Dummy Group<br>
+Step 4: ينتظر زيارة الفني<br>
+Step 5: MSAN غير متاحة<br>
+Step 6: Close بـ Success فقط
+
+</div>
+
+<!-- SLA -->
+<div id="slaBox">
+<h3>📊 SLA - Unreached Survey</h3>
+
+<b>Status:</b> Unreached Survey<br>
+<b>SLA:</b> 5 Days<br><br>
+
+فى المرحلة دى:<br>
+- بيتم إرسال فنى FO-Fiber<br>
+- للتأكد من جاهزية المكان<br>
+- وبيتم مد كابل الفايبر من البوكس لحد باب الشقة<br>
+
+⚠️ لازم يتم خلال 5 أيام
+
+</div>
+
+<!-- Delay -->
+<div id="delayBox">
+<h3>⏱ Installation Delay Action</h3>
+
+فى حالة تأخير التركيب:<br><br>
+
+✔ Create TT:<br>
+FBB Non-Technical Complaint<br><br>
+
+✔ Category:<br>
+Migration - Installation → FO-Fiber - Delay<br><br>
+
+✔ Follow Up:<br>
+Activation Follow Up (4 Hours)<br><br>
+
+✔ Status:<br>
+Waiting for action - Activation Team
+
+</div>
+
+<button class="copy" onclick="copyResult()">Copy</button>
+<button class="reset" onclick="resetAll()">Reset</button>
+
+</div>
+
+<script>
+
+const inputs = document.querySelectorAll('input');
+inputs.forEach(i => i.addEventListener('change', generate));
+
+function generate() {
+  const grace = document.querySelector('input[name="grace"]:checked')?.value;
+  const problem = document.querySelector('input[name="problem"]:checked')?.value;
+  const reachable = document.querySelector('input[name="reachable"]:checked')?.value;
+  const resolved = document.querySelector('input[name="resolved"]:checked')?.value;
+
+  const box = document.getElementById("result");
+
+  const flowBtn = document.getElementById("flowBtn");
+  const slaBtn = document.getElementById("slaBtn");
+  const delayBtn = document.getElementById("delayBtn");
+
+  // hide all
+  flowBtn.style.display = "none";
+  slaBtn.style.display = "none";
+  delayBtn.style.display = "none";
+
+  if (!grace || !problem || !reachable || !resolved) {
+    box.style.display = "none";
+    return;
+  }
+
+  let text = "";
+  let cls = "";
+
+  if (grace === "yes" && problem === "yes") {
+
+    if (reachable === "no") {
+      text = "MSAN Deactivation - CST Informed";
+      cls = "danger";
+
+      flowBtn.style.display = "inline-block";
+      slaBtn.style.display = "inline-block";
+      delayBtn.style.display = "inline-block"; // 🔥 مهم
+
+    } else if (resolved === "yes") {
+      text = "Close TT with success";
+      cls = "success";
+    } else {
+      text = "Survey Grace Period Follow Up";
+      cls = "warning";
+
+      slaBtn.style.display = "inline-block";
+    }
+
+  } else {
+    text = "Follow within 24H";
+    cls = "warning";
+  }
+
+  box.style.display = "block";
+  box.className = cls;
+  box.innerText = text;
+}
+
+function toggle(id){
+  const el = document.getElementById(id);
+  el.style.display = el.style.display === "none" ? "block" : "none";
+}
+
+function copyResult() {
+  const text = document.getElementById("result").innerText;
+  if (!text) return;
+  navigator.clipboard.writeText(text);
+  alert("Copied!");
+}
+
+function resetAll() {
+  document.querySelectorAll('input').forEach(i => i.checked = false);
+  document.getElementById("result").style.display = "none";
+  document.querySelectorAll('#flowBox,#slaBox,#delayBox').forEach(e=>e.style.display="none");
+  document.querySelectorAll('#flowBtn,#slaBtn,#delayBtn').forEach(e=>e.style.display="none");
+}
+
+</script>
+
+</body>
+</html>

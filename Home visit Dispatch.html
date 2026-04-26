@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FTTH Home Visit Dispatch Tool</title>
+
+<style>
+body { font-family: Arial; background:#f5f5f5; padding:20px; }
+.container { background:#fff; padding:20px; border-radius:10px; max-width:900px; margin:auto; }
+
+.section { margin-bottom:15px; }
+
+#result {
+  margin-top:20px;
+  padding:15px;
+  border-radius:8px;
+  display:none;
+  font-weight:bold;
+  background:#f8d7da;
+}
+
+#note {
+  margin-top:15px;
+  padding:15px;
+  border-radius:10px;
+  background:#eef7ff;
+  display:none;
+}
+
+.step {
+  background:#fff;
+  margin-bottom:10px;
+  padding:10px;
+  border-left:4px solid #007bff;
+}
+
+button {
+  margin-top:10px;
+  padding:8px 12px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+.copy { background:green; color:#fff; }
+.reset { background:red; color:#fff; }
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<h3>Home Visit Dispatch</h3>
+
+<div class="section">
+<label>Home Visit Dispatch</label><br>
+<label><input type="radio" name="dispatch" value="yes"> Yes</label>
+<label><input type="radio" name="dispatch" value="no"> No</label>
+</div>
+
+<div class="section">
+<label>CRM Payment Issue</label><br>
+<label><input type="radio" name="crm" value="yes"> Yes</label>
+<label><input type="radio" name="crm" value="no"> No</label>
+</div>
+
+<div class="section">
+<label>Delay Happened?</label><br>
+<label><input type="radio" name="delay" value="yes"> Yes</label>
+<label><input type="radio" name="delay" value="no"> No</label>
+</div>
+
+<div id="result"></div>
+<div id="note"></div>
+
+<button class="copy" onclick="copyResult()">Copy</button>
+<button class="reset" onclick="resetAll()">Reset</button>
+
+</div>
+
+<script>
+
+const inputs = document.querySelectorAll('input');
+inputs.forEach(i => i.addEventListener('change', generate));
+
+function generate() {
+
+  const dispatch = document.querySelector('input[name="dispatch"]:checked')?.value;
+  const crm = document.querySelector('input[name="crm"]:checked')?.value;
+  const delay = document.querySelector('input[name="delay"]:checked')?.value;
+
+  const result = document.getElementById("result");
+  const note = document.getElementById("note");
+
+  if (!dispatch || !crm || !delay) {
+    result.style.display = "none";
+    note.style.display = "none";
+    return;
+  }
+
+  // 🔴 CRM PAYMENT ISSUE
+  if (dispatch === "yes" && crm === "yes") {
+
+    result.style.display = "block";
+    note.style.display = "block";
+
+    result.innerText =
+    "SR: FBB Non Tech follow up -> FTTH Migration -> CRM Payment failed CSO direction Create";
+
+    note.innerHTML = `
+
+    <div class="step"><b>📌 Home Visit Dispatch:</b><br>
+    بيتم إرسال فني للعميل لاستلام الراوتر (لو إيجار) + تركيب ONT وتفعيل الخدمة
+    </div>
+
+    <div class="step"><b>📊 SLA:</b><br>
+    ➜ 2 Days (Cairo / Giza / Alex)<br>
+    ➜ 5 Days (Other Governorates)
+    </div>
+
+    <div class="step"><b>Step 1:</b> في حالة CRM Payment Issue<br>
+    ➜ الـ Order يتحول لـ Home Visit Grace Period
+    </div>
+
+    <div class="step"><b>Step 2:</b> يتم إنشاء Automatic TT</div>
+
+    <div class="step"><b>Step 3:</b> توجيه العميل للـ CSO لدفع الرسوم<br>
+    ➜ (Pending fees على MSAN زي تجديد الباقة)
+    </div>
+
+    <div class="step"><b>Step 4:</b> ❗ متقفلش TT<br>
+    ➜ اكتب Comment إن العميل اتوجه للـ CSO
+    </div>
+
+    <div class="step"><b>Step 5:</b> لو العميل دفع واتصل<br>
+    ➜ اقفل TT بـ Success
+    </div>
+
+    <div class="step"><b>Step 6:</b> لو العميل دفع لجهازين<br>
+    ➜ اسأله رجع الـ CPE القديم؟<br>
+    ➜ لو لأ → وجهه للفرع<br>
+    ➜ لو آه → Retail Complaint (Wrong Action)
+    </div>
+
+    <div class="step"><b>Step 7:</b> الفني يبلغ العميل:<br>
+    ➜ يقدر يحتفظ بالراوتر ويدفع إيجار<br>
+    ➜ أو يرجعه<br>
+    </div>
+
+    <div class="step"><b>Step 8:</b> Voice Order<br>
+    ➜ هتفضل WO Problem لحد ما Data تخلص
+    </div>
+
+    <div class="step"><b>Step 9:</b> لو المشكلة مستمرة 10 أيام<br>
+    ➜ الخط يتم إيقافه
+    </div>
+
+    `;
+  }
+
+  // 🟠 DELAY CASE
+  else if (delay === "yes") {
+
+    result.style.display = "block";
+    note.style.display = "block";
+
+    result.innerText =
+    "TT: FBB Non-Technical Complaint -> Migration - Installation -> FTTH-Support - Delay Create";
+
+    note.innerHTML = `
+
+    <div class="step"><b>📊 SLA:</b><br>
+    ➜ Activation Follow Up: 4 Hours
+    </div>
+
+    <div class="step"><b>Step 1:</b> تم رصد تأخير في المرحلة</div>
+
+    <div class="step"><b>Step 2:</b> إنشاء TT Delay</div>
+
+    <div class="step"><b>Step 3:</b> الحالة:<br>
+    ➜ Waiting for action - Activation Team
+    </div>
+
+    `;
+  }
+
+  // 🟢 NORMAL
+  else {
+    result.style.display = "block";
+    note.style.display = "block";
+
+    result.innerText = "Normal Home Visit Flow";
+
+    note.innerHTML = `
+
+    <div class="step"><b>📌 Home Visit:</b><br>
+    الفني بيروح للعميل<br>
+    ➜ يسلم الراوتر (لو إيجار)<br>
+    ➜ يركب ONT<br>
+    ➜ يفعل الخدمة
+    </div>
+
+    <div class="step"><b>📊 SLA:</b><br>
+    ➜ 2 Days (Cairo / Giza / Alex)<br>
+    ➜ 5 Days (Other GOV)
+    </div>
+
+    `;
+  }
+}
+
+function copyResult() {
+  const text = document.getElementById("result").innerText;
+  if (!text) return;
+  navigator.clipboard.writeText(text);
+  alert("Copied!");
+}
+
+function resetAll() {
+  document.querySelectorAll('input').forEach(i => i.checked = false);
+  document.getElementById("result").style.display = "none";
+  document.getElementById("note").style.display = "none";
+}
+
+</script>
+
+</body>
+</html>

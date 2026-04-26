@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FTTH SMART SYSTEM PRO</title>
+
+<style>
+body{
+ margin:0;
+ font-family:'Segoe UI';
+ background:#eef2f7;
+}
+
+/* Header */
+header{
+ background:#111;
+ color:#fff;
+ padding:15px;
+ text-align:center;
+ font-size:20px;
+}
+
+/* Tabs */
+.tabs{
+ display:flex;
+ flex-wrap:wrap;
+ gap:8px;
+ padding:10px;
+}
+
+.tabs button{
+ padding:6px 12px;
+ border:none;
+ border-radius:20px;
+ background:#fff;
+ cursor:pointer;
+ transition:.2s;
+}
+
+.tabs button:hover{
+ transform:scale(1.05);
+}
+
+.tabs button.active{
+ background:#2563eb;
+ color:#fff;
+}
+
+/* Status */
+#statusBar{
+ margin:10px;
+ padding:10px;
+ border-radius:10px;
+ color:#fff;
+ font-weight:bold;
+ text-align:center;
+}
+
+/* Frame */
+iframe{
+ width:100%;
+ height:75vh;
+ border:none;
+ margin-top:10px;
+}
+
+/* Notify */
+.notify{
+ position:fixed;
+ top:20px;
+ right:20px;
+ background:#ef4444;
+ color:#fff;
+ padding:10px;
+ border-radius:6px;
+ z-index:9999;
+}
+
+/* Blink */
+.blink{
+ animation:blink 1s infinite;
+}
+
+@keyframes blink{
+ 0%{opacity:1;}
+ 50%{opacity:0.3;}
+ 100%{opacity:1;}
+}
+</style>
+
+</head>
+
+<body>
+
+<header>🔥 FTTH SMART SYSTEM PRO</header>
+
+<div class="tabs">
+<button onclick="openTab('Direct to CSO.html',this)">Direct to CSO</button>
+<button onclick="openTab('Network Activation.html',this)">Network Activation</button>
+<button onclick="openTab('Check CPE SN.html',this)">Check CPE</button>
+<button onclick="openTab('Home Visit Deactivation.html',this)">MSAN Deactivation</button>
+<button onclick="openTab('Home Visit Grace Period.html',this)">Home Visit Grace</button>
+<button onclick="openTab('Home visit Dispatch.html',this)">Dispatch</button>
+<button onclick="openTab('Unreached Survey.html',this)">Unreached</button>
+<button onclick="openTab('Survey.html',this)">Survey</button>
+<button onclick="openTab('Customer readiness notification.html',this)">Readiness</button>
+<button onclick="openTab('Deactivated on CST 360.html',this)">CST360</button>
+<button onclick="openTab('daley.html',this)">🚨 Delay Monitor</button>
+</div>
+
+<div id="statusBar">Ready</div>
+
+<div style="padding:10px">
+📅 Start Date: <input type="date" id="date">
+</div>
+
+<iframe id="frame"></iframe>
+
+<script>
+
+let current="";
+let alertShown={};
+
+/* فتح الصفحات */
+function openTab(page,btn){
+
+ current=page;
+
+ document.getElementById("frame").src = page;
+
+ document.querySelectorAll(".tabs button")
+  .forEach(b=>b.classList.remove("active"));
+
+ btn.classList.add("active");
+}
+
+/* Notification */
+function notify(msg){
+ let n=document.createElement("div");
+ n.className="notify";
+ n.innerText=msg;
+ document.body.appendChild(n);
+ setTimeout(()=>n.remove(),3000);
+}
+
+/* لون الحالة */
+function color(d){
+ if(d<2)return"#22c55e";
+ if(d<4)return"#facc15";
+ if(d<5)return"#fb923c";
+ return"#ef4444";
+}
+
+/* Delay Tracker */
+setInterval(()=>{
+
+ let dateInput=document.getElementById("date").value;
+ if(!dateInput) return;
+
+ let d=Math.floor((new Date()-new Date(dateInput))/(1000*60*60*24));
+ let delayed=d>=5;
+
+ let bar=document.getElementById("statusBar");
+
+ bar.innerHTML=`Days: ${d} | ${delayed?"🚨 Delayed":"⏳ Active"}`;
+ bar.style.background=color(d);
+
+ if(delayed) bar.classList.add("blink");
+ else bar.classList.remove("blink");
+
+ if(delayed && !alertShown[current]){
+  notify("🚨 Case تجاوزت 5 أيام");
+  alertShown[current]=true;
+ }
+
+},1000);
+
+</script>
+
+</body>
+</html>

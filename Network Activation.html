@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Network Activation Tool</title>
+
+<style>
+body {font-family: Arial; background:#f5f5f5; padding:20px;}
+.container {background:#fff; padding:20px; border-radius:10px; max-width:850px; margin:auto;}
+
+.section {margin-bottom:15px;}
+
+#result {
+  margin-top:20px;
+  padding:15px;
+  border-radius:8px;
+  display:none;
+  font-weight:bold;
+}
+
+.success {background:#d4edda;}
+.warning {background:#fff3cd;}
+
+#note {
+  margin-top:15px;
+  padding:15px;
+  border-radius:10px;
+  background:#eef7ff;
+  display:none;
+}
+
+.step {
+  background:#fff;
+  margin-bottom:10px;
+  padding:10px;
+  border-left:4px solid #007bff;
+}
+
+button {margin-top:10px; padding:8px 12px; border:none; border-radius:6px; cursor:pointer;}
+.copy {background:green; color:white;}
+.reset {background:red; color:white;}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<h3>Network Activation</h3>
+
+<div class="section">
+<label>Order Stuck Time</label><br>
+<label><input type="radio" name="time" value="within"> Less than 1 Hour</label>
+<label><input type="radio" name="time" value="after"> More than 1 Hour</label>
+</div>
+
+<div id="result"></div>
+<div id="note"></div>
+
+<button class="copy" onclick="copyResult()">Copy</button>
+<button class="reset" onclick="resetAll()">Reset</button>
+
+</div>
+
+<script>
+
+const inputs = document.querySelectorAll('input');
+inputs.forEach(i => i.addEventListener('change', generate));
+
+function generate() {
+
+  const time = document.querySelector('input[name="time"]:checked')?.value;
+
+  const result = document.getElementById("result");
+  const note = document.getElementById("note");
+
+  if (!time) {
+    result.style.display = "none";
+    note.style.display = "none";
+    return;
+  }
+
+  // 🟢 Within SLA
+  if (time === "within") {
+
+    result.style.display = "block";
+    result.className = "success";
+    note.style.display = "block";
+
+    result.innerText =
+    "SR: FBB Non Tech follow up -> FTTH Migration -> Network activation within SLA Create";
+
+    note.innerHTML = `
+
+    <div class="step"><b>📌 Activity:</b><br>
+    Network Activation هي عملية Automatic
+    </div>
+
+    <div class="step"><b>📊 SLA:</b><br>
+    ➜ 1 Hour
+    </div>
+
+    <div class="step"><b>Step 1:</b> الأوردر لسه داخل الـ SLA</div>
+
+    <div class="step"><b>Step 2:</b> لا يتم اتخاذ إجراء</div>
+
+    <div class="step"><b>Step 3:</b> يتم المتابعة فقط (Monitor)</div>
+
+    <div class="step"><b>Step 4:</b> في حالة تعدي 1 ساعة يتم اتخاذ إجراء</div>
+
+    `;
+  }
+
+  // 🔴 After SLA
+  else {
+
+    result.style.display = "block";
+    result.className = "warning";
+    note.style.display = "block";
+
+    result.innerText =
+    "SR: FBB Non Tech follow up -> FTTH Migration -> Network activation after SLA Create";
+
+    note.innerHTML = `
+
+    <div class="step"><b>📌 Activity:</b><br>
+    Network Activation هي عملية Automatic
+    </div>
+
+    <div class="step"><b>📊 SLA:</b><br>
+    ➜ 1 Hour (تم تجاوزها)
+    </div>
+
+    <div class="step"><b>Step 1:</b> تم رصد تأخير (أكثر من 1 ساعة)</div>
+
+    <div class="step"><b>Step 2:</b> يتم إنشاء SR:</div>
+
+    <div class="step">
+    ➜ FBB Non Tech follow up<br>
+    ➜ FTTH Migration<br>
+    ➜ Network activation after SLA
+    </div>
+
+    <div class="step"><b>Step 3:</b> يتم متابعة الحالة مع الفريق المختص</div>
+
+    <div class="step"><b>Step 4:</b> استمرار المتابعة حتى حل المشكلة</div>
+
+    `;
+  }
+}
+
+function copyResult() {
+  const text = document.getElementById("result").innerText;
+  if (!text) return;
+  navigator.clipboard.writeText(text);
+  alert("Copied!");
+}
+
+function resetAll() {
+  document.querySelectorAll('input').forEach(i => i.checked = false);
+  document.getElementById("result").style.display = "none";
+  document.getElementById("note").style.display = "none";
+}
+
+</script>
+
+</body>
+</html>

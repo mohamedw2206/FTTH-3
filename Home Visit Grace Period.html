@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Home Visit Grace Tool</title>
+
+<style>
+body {font-family: Arial; background:#f5f5f5; padding:20px;}
+.container {background:#fff; padding:20px; border-radius:10px; max-width:850px; margin:auto;}
+
+.section {margin-bottom:15px;}
+
+#result {
+  margin-top:20px;
+  padding:15px;
+  border-radius:8px;
+  display:none;
+  font-weight:bold;
+  background:#fff3cd;
+}
+
+#note {
+  margin-top:15px;
+  padding:15px;
+  border-radius:10px;
+  background:#eef7ff;
+  display:none;
+}
+
+.step {
+  background:#fff;
+  margin-bottom:10px;
+  padding:10px;
+  border-left:4px solid #007bff;
+}
+
+button {margin-top:10px; padding:8px 12px; border:none; border-radius:6px; cursor:pointer;}
+.copy {background:green; color:white;}
+.reset {background:red; color:white;}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<h3>Home Visit Grace Period</h3>
+
+<div class="section">
+<label>Home Visit Stage</label><br>
+<label><input type="radio" name="visit" value="yes"> Yes</label>
+<label><input type="radio" name="visit" value="no"> No</label>
+</div>
+
+<div class="section">
+<label>Customer Problem</label><br>
+<label><input type="radio" name="problem" value="yes"> Yes</label>
+<label><input type="radio" name="problem" value="no"> No</label>
+</div>
+
+<div class="section">
+<label>Problem Resolved After Visit</label><br>
+<label><input type="radio" name="resolved" value="yes"> Yes</label>
+<label><input type="radio" name="resolved" value="no"> No</label>
+</div>
+
+<div id="result"></div>
+<div id="note"></div>
+
+<button class="copy" onclick="copyResult()">Copy</button>
+<button class="reset" onclick="resetAll()">Reset</button>
+
+</div>
+
+<script>
+
+const inputs = document.querySelectorAll('input');
+inputs.forEach(i => i.addEventListener('change', generate));
+
+function generate() {
+
+  const visit = document.querySelector('input[name="visit"]:checked')?.value;
+  const problem = document.querySelector('input[name="problem"]:checked')?.value;
+  const resolved = document.querySelector('input[name="resolved"]:checked')?.value;
+
+  const result = document.getElementById("result");
+  const note = document.getElementById("note");
+
+  if (!visit || !problem || !resolved) {
+    result.style.display = "none";
+    note.style.display = "none";
+    return;
+  }
+
+  // 🔴 Grace Period Case
+  if (visit === "yes" && problem === "yes" && resolved === "no") {
+
+    result.style.display = "block";
+    note.style.display = "block";
+
+    result.innerText =
+    "SR: FBB Non Tech follow up -> FTTH Migration -> Home Visit Grace Period - CST Informed Create";
+
+    note.innerHTML = `
+
+    <div class="step"><b>Step 1:</b> الـ Order يتحول لـ Home Visit Grace Period Activity بسبب وجود Customer Problem</div>
+
+    <div class="step"><b>Step 2:</b> يتم إنشاء Automatic TT:</div>
+
+    <div class="step">
+    ➜ FTTH - NON Technical Problem Migration - Home Visit Grace Period<br>
+    ➜ Work Group 1: Fulfillment Follow Up (SLA: 24H)<br>
+    ➜ Work Group 2: FTTH Follow Up (SLA: 7 Days)
+    </div>
+
+    <div class="step"><b>Step 3:</b> وجود الـ Order في المرحلة دي = لازم يتم إبلاغ العميل بالمشكلة</div>
+
+    <div class="step"><b>Step 4:</b> CCA يراجع OM Comments لتحديد سبب المشكلة</div>
+
+    <div class="step"><b>Step 5:</b> Activation Team يتابع مع العميل خلال 24 ساعة</div>
+
+    <div class="step"><b>Step 6:</b> يتم غلق TT حسب الحالة:<br>
+    ➜ Reached<br>
+    ➜ Unreached
+    </div>
+
+    <div class="step"><b>Step 7:</b> لو العميل اتصل:</div>
+
+    <div class="step">
+    ➜ نتأكد إن المشكلة اتحلت<br>
+    ➜ يتم غلق TT بـ Success<br>
+    ➜ الـ Order يرجع لـ Home Visit Activity
+    </div>
+
+    `;
+  }
+
+  // 🟢 Resolved
+  else if (resolved === "yes") {
+    result.style.display = "block";
+    note.style.display = "block";
+
+    result.innerText = "Close TT with success";
+
+    note.innerHTML = `
+    <div class="step"><b>✔ تم حل المشكلة:</b><br>
+    ➜ يتم غلق TT بـ Success<br>
+    ➜ الـ Order يكمل بشكل طبيعي
+    </div>
+    `;
+  }
+
+  else {
+    result.style.display = "block";
+    result.innerText = "No action required";
+    note.style.display = "none";
+  }
+}
+
+function copyResult() {
+  const text = document.getElementById("result").innerText;
+  if (!text) return;
+  navigator.clipboard.writeText(text);
+  alert("Copied!");
+}
+
+function resetAll() {
+  document.querySelectorAll('input').forEach(i => i.checked = false);
+  document.getElementById("result").style.display = "none";
+  document.getElementById("note").style.display = "none";
+}
+
+</script>
+
+</body>
+</html>

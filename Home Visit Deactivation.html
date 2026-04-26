@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MSAN Deactivation Tool</title>
+
+<style>
+body {font-family: Arial; background:#f5f5f5; padding:20px;}
+.container {background:#fff; padding:20px; border-radius:10px; max-width:850px; margin:auto;}
+
+.section {margin-bottom:15px;}
+
+#result {
+  margin-top:20px;
+  padding:15px;
+  border-radius:8px;
+  display:none;
+  font-weight:bold;
+  background:#f8d7da;
+}
+
+#note {
+  margin-top:15px;
+  padding:15px;
+  border-radius:10px;
+  background:#eef7ff;
+  display:none;
+}
+
+.step {
+  background:#fff;
+  margin-bottom:10px;
+  padding:10px;
+  border-left:4px solid #dc3545;
+}
+
+button {margin-top:10px; padding:8px 12px; border:none; border-radius:6px; cursor:pointer;}
+.copy {background:green; color:white;}
+.reset {background:red; color:white;}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<h3>MSAN Deactivation (Home Visit Grace)</h3>
+
+<div class="section">
+<label>Home Visit Grace Period</label><br>
+<label><input type="radio" name="grace" value="yes"> Yes</label>
+<label><input type="radio" name="grace" value="no"> No</label>
+</div>
+
+<div class="section">
+<label>Customer Reachable</label><br>
+<label><input type="radio" name="reachable" value="yes"> Yes</label>
+<label><input type="radio" name="reachable" value="no"> No</label>
+</div>
+
+<div id="result"></div>
+<div id="note"></div>
+
+<button class="copy" onclick="copyResult()">Copy</button>
+<button class="reset" onclick="resetAll()">Reset</button>
+
+</div>
+
+<script>
+
+const inputs = document.querySelectorAll('input');
+inputs.forEach(i => i.addEventListener('change', generate));
+
+function generate() {
+
+  const grace = document.querySelector('input[name="grace"]:checked')?.value;
+  const reachable = document.querySelector('input[name="reachable"]:checked')?.value;
+
+  const result = document.getElementById("result");
+  const note = document.getElementById("note");
+
+  if (!grace || !reachable) {
+    result.style.display = "none";
+    note.style.display = "none";
+    return;
+  }
+
+  if (grace === "yes" && reachable === "no") {
+
+    result.style.display = "block";
+    note.style.display = "block";
+
+    result.innerText =
+    "SR: FBB Non Tech follow up -> FTTH Migration -> MSAN Deactivation - CST Informed Create";
+
+    note.innerHTML = `
+
+    <div class="step"><b>Step 1:</b> الـ Order بيتحول لـ MSAN Deactivation Activity</div>
+
+    <div class="step"><b>Step 2:</b> السبب:<br>
+    ➜ Activation Team لم يتمكن من الوصول للعميل خلال Home Visit Grace Period
+    </div>
+
+    <div class="step"><b>Step 3:</b> يتم إرسال SMS للعميل:<br>
+    ➜ خدمة MSAN سيتم إلغاؤها<br>
+    ➜ الاتصال بـ 111 أو زيارة الفرع لاستكمال Migration
+    </div>
+
+    <div class="step"><b>Step 4:</b> Automatic TT:</div>
+
+    <div class="step">
+    ➜ FTTH → NON Technical Problem Migration → Home Visit De-activation<br>
+    ➜ Work Group: Dummy Group
+    </div>
+
+    <div class="step"><b>Step 5:</b> ❌ غير مسموح إغلاق TT بـ Not Solved</div>
+
+    <div class="step"><b>Step 6:</b> لو العميل اتصل:</div>
+
+    <div class="step">
+    ➜ يتم إبلاغه إن الـ Migration مستمرة<br>
+    ➜ ينتظر زيارة تركيب ONT أو Notification للفرع
+    </div>
+
+    <div class="step"><b>Step 7:</b> لو سأل عن MSAN:<br>
+    ➜ الخدمة لم تعد متاحة على خطه
+    </div>
+
+    <div class="step"><b>Step 8:</b> ✔ يتم غلق TT بـ Success</div>
+
+    <div class="step"><b>Step 9:</b> ➜ الـ Order يرجع لـ Home Visit Activity</div>
+
+    `;
+  }
+
+  else {
+    result.style.display = "block";
+    result.innerText = "No action required";
+    note.style.display = "none";
+  }
+}
+
+function copyResult() {
+  const text = document.getElementById("result").innerText;
+  if (!text) return;
+  navigator.clipboard.writeText(text);
+  alert("Copied!");
+}
+
+function resetAll() {
+  document.querySelectorAll('input').forEach(i => i.checked = false);
+  document.getElementById("result").style.display = "none";
+  document.getElementById("note").style.display = "none";
+}
+
+</script>
+
+</body>
+</html>
